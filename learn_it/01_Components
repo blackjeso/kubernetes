@@ -1,0 +1,195 @@
+Kubernetes Tutorial for Beginners [FULL COURSE in 4 Hours]
+https://www.youtube.com/watch?v=X48VuDVv0do
+
+Definition of Kubernetes
+- Open Source
+- Developed by Google
+- Manage contrainerized application
+- Different deployment environments
+--> physical / virtual / (hybrid-)cloud
+
+The need for a container orchestration tool
+- Way from mmonolith to microservices
+- Increased usage of containers (10/100/1000)
+- Managed theses huge amount of containers
+
+Features orchestrations tools offers
+- HA
+- Scalability (+ high performance) 
+- Disaster Recovery
+
+##############
+# Components
+##############
+
+K8s Node (VM oder bare metal)
+-> POD (is a container)
+- Smallest unit of K8s
+- Kubernetes abstracts a container as PODs to use different technologies (docker/containerd/...)
+- Multiple PODs per Node
+- Usually one applcationcontainer per POD
+- PODs are emphermeral (so they can die)
+
+##############
+# Components - IP
+##############
+Node
+------
+POD - IP
+
+POD - IP
+------
+- K8s offers a virtual network.
+- Every POD gets its own (internal) IP address
+- If a POD dies and will be recreated it gets a new IP
+--> Communication ... ? -> Service
+
+
+##############
+# Components - Service
+##############
+Node
+------
+App-POD - IP + Service + DNS-Name
+                 |
+DB-POD -  IP + Service + DNS-Name
+------
+- Service = permanent IP
+- Lifecycle of POD ans Service are NOT connected
+- Service is also a loadbalancer
+
+
+##############
+# Components - Service Internal/External
+##############
+External service
+- http://my-app-service-ip:port (Node-IP) - only foor testing!
+- To reach the application from outside of k8s cluster
+Internal service
+- http://db-service.ip:port - NOPE
+- not recommended 
+- i.e. DB should only be available from "internal"
+
+
+##############
+# Components - Ingress
+##############
+
+External service
+- http://my-app-service-ip:port (Node-IP) - only for testing!
+- not a good way
+- better -> http://my-app.com -> INGRESS
+
+Node
+------
+           Ingress
+             |
+App-POD - Service
+             |
+DB-POD -  Service
+------
+
+
+##############
+# Components - External Configuration - Configmaps + Secrets
+##############
+Node
+------
+App-POD - Service (apache-app-service)
+             |
+DB-POD -  Service (mongo-db-service)
+------
+
+- App must talk to DB, therefor it needs connection data -> "mongo-db-service"
+- If these infos are built in the application/image, the image has to changed every time the "service-name" changes
+-> rebuild application
+-> push to repo
+-> pull into new POD
+
+Solution -> "ConfigMap:"
+- external configuration of your application
+
+Sensitive Data -> "Secret:"
+- used to store secret data
+- base64 encoded !!!
+- the built-in securit mechanism i not enabled by default!
+
+Use ConfigMap and Secret data as environment variables or as a properties file
+
+
+##############
+# Components - Volumes (Data storage)
+##############
+
+Data storage in containers are by default not persistent!
+
+The solution are = "Volumes"
+
+Node
+------
+App-POD - Service 
+            |
+DB-POD -  Service
+   |
+Volumes (local or remote (SAN, Cloud, ...))
+------
+
+- Volumes attach a storage-"device" to POD
+- K8s doesn't manage data persistance!
+
+
+##############
+# Components - Redundancy/Replicas/Deployments
+##############
+Node1                 Node2
+------
+App-POD -> Service <- App-POD  
+                 
+DB-POD ->  Service <- DB-POD
+------
+
+Deployments
+- are blueprints for replicating PODs
+- You will define in a deployment for a POD how many replicas will be created in the K8s-Cluster
+- You will mostly work with deployments (not PODs in future)
+
+- POD is a abstraction of container
+- Deployment is a abstraction of POD/s
+
+
+##############
+# Components - StatefulSet (not easy)
+##############
+Node1                 Node2
+------
+App-POD -> Service <- App-POD  
+                 
+DB-POD ->  Service <- DB-POD
+------
+
+- Just replicating DBs is bad because ...
+-> a DB has a state = it's data
+-> If multuple DBs connect to the same data
+-> data-/storage would be destroyed
+- A mechanism to controll the access to the is need to
+-> avoid data inconsistency
+- Solution= "StatefulSet"
+
+Such PODs should always be craeted with StatefulSet and not Deployment!
+StateLESS Apps will be deployed with Deployment!
+
+- Maybe host StatefulSet like a DB outside the K8s-Cluster ...
+
+##############
+# Components - summarized
+##############
+
+POD = POD (abstractions of containers)
+Serice = SVC (communication)
+Ingress = ing (route traffic into cluster)
+ConfigMap = cm (external configuration)
+Secrets = secret (external configuration)
+Volumes = vol (data persistence)
+Deployments = deploy (POD blueprints + replication mechanism)
+StatefulSet = sts (POD blueprints + replication mechanism)
+
