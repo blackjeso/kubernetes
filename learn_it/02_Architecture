@@ -1,0 +1,110 @@
+Kubernetes Tutorial for Beginners [FULL COURSE in 4 Hours]
+https://www.youtube.com/watch?v=X48VuDVv0do
+
+##############
+# (Worker-)Node processes
+##############
+Worker-Node
+------
+App-POD - Service
+             |
+DB-POD -  Service
+------
+- each Worker-Node has multiple Pods
+- Each Worker-Node has 3 processes (needed!)
+- Worker-Nodes to the actual work
+
+3 Processes:
+
+- Container runtime
+- kubelet
+- kubeproxy
+
+
+- Independent container runtime
+-> docker,containerd,...)
+
+- kubelet (interacts with both - container and worker-node)
+-> managing 
+--> starts/stops/destroy pods
+--> Ressources (RAM,CPU,Storage) Worker-Node <-> POD
+
+- kubeproxy (forwards requests from Services to PODs)
+-> build-in algos to forward request in an efficient way
+
+
+##############
+# (Master-)Node processes
+##############
+
+How to interact with a K8s-cluster
+
+Master-Node processes:
+
+- API-Server
+- Scheduler
+- Controller Manager
+- etcd
+
+- API-Server 
+-> Communicate via UI, API, kubelet (CLI)
+-> Cluster GW
+-> Gatekeeper for authentication !
+--> One entry point and central auth authority for the cluster
+
+
+- Scheduler
+-> Plans (via algos) and decide to do work (i.e. create new POD)
+-> Doesn't do the work !!!
+I.e.:
+Client = Schedule new POD
+  |
+API-Server
+  |
+Scheduler (Where to put the POD - compares ressource usage of worker-nodes)
+  |
+Kubelet (Do the work on the worker-nodes)
+
+
+- Controller manager
+-> Detect cluster state changes
+-> Reschedule based on events i.e. new PODs (for PODs that died)
+I.e.:
+Controller manager (Detected a crashed POD)
+  |
+Scheduler (Where to put the POD - compares ressource usage of worker-nodes)
+  |
+Kubelet (Do the work on the worker-nodes)
+
+
+- etcd
+-> Key values store of the cluster state (cluster brain)
+-> No application data stored!!!
+I.e.:
+API-Server -> Is the cluster healthy
+Scheduler -> wants to know which ressources are available on each worker-nodes
+Controller manager -> wants to know whats the desired state of cluster
+
+
+#########
+#Multiple Master-Nodes
+#########
+Client
+  |
+Update / Query
+  |
+Master-Node1         Master-Node2
+---------
+API-Server           API-Server        (A load balanced service)
+Scheduler            Scheduler
+Controller manager   Controller manager
+etcd                 etcd              (Distributed storage across all master nodes)
+---------
+
+
+
+
+Node = node
+Kubelet = kubelet
+Kubeproxy = k-proxy
+Master-Node = master
