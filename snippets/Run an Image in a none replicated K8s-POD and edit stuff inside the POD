@@ -1,5 +1,3 @@
-Run an Image in a none replicated K8s-POD and edit stuff inside the POD
-
 k run nginx --image=nginx
 k get pods -o wide 
 # OR -> k get all -o wide
