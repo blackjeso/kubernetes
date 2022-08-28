@@ -1,0 +1,14 @@
+Run an Image in a none replicated K8s-POD and edit stuff inside the POD
+
+k run nginx --image=nginx
+k get pods -o wide 
+# OR -> k get all -o wide
+NAME    READY   STATUS    RESTARTS   AGE   IP           NODE          NOMINATED NODE   READINESS GATES
+nginx   1/1     Running   0          11m   10.42.0.22   k3smaster01   <none>           <none>
+
+curl <POD-IP>
+k exec -it nginx -- /bin/bash
+# now inside the Dockercontainer
+sed -i "/required\./a OMG ;-)" /usr/share/nginx/html/index.html
+
+curl <POD-IP>
