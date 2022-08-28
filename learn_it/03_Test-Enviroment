@@ -1,0 +1,72 @@
+Kubernetes Tutorial for Beginners [FULL COURSE in 4 Hours]
+https://www.youtube.com/watch?v=X48VuDVv0do
+
+https://kubernetes.io/docs/tasks/tools/
+
+Possible Tools 
+- MiniKube - https://minikube.sigs.k8s.io/docs/start/
+- Kind - https://kind.sigs.k8s.io/docs/user/quick-start/
+- K3s - https://k3s.io/
+- Kubeadm - https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+
+Links
+- https://www.jambit.com/aktuelles/toilet-papers/minikube-vs-kind-vs-k3s-welches-lokale-kubernetes-cluster-eignet-sich-am-besten/
+- https://blog.flant.com/small-local-kubernetes-comparison/
+- https://earthly.dev/blog/k8s-dev-solutions/
+
+
+I decided to go with K3s the first time.
+
+#########
+#Environment
+#########
+
+I don't want to use cloud instances at the moment. On the other hand i have no possibility to build up a homelab.
+Therefor i will use my laptop with VirtualBox
+
+Virtualbox
+- 3 VMs (1xMaster + 2xWorker)
+- Bridge Network
+- Register MACs in Homerouter for a fix IP via DHCP (DNS is also included)
+-> 192.168.178.250 k3smaster01
+-> 192.168.178.251/252 k3sworker01/02
+-> Debian 11 base installtion
+
+#########
+#Installation of K3s
+#########
+https://rancher.com/docs/k3s/latest/en/quick-start/
+
+- k3smaster01
+-> curl -sfL https://get.k3s.io | sh -
+-> k3s kubectl get node
+-> cat /var/lib/rancher/k3s/server/node-token
+-> k3s Config -> cat /etc/rancher/k3s/k3s.yaml | yq
+
+- k3sworker01/02
+-> curl -sfL https://get.k3s.io | K3S_URL=https://k3smaster01.fritz.box:6443 K3S_TOKEN=mynodetoken sh -
+
+Result:
+root@k3smaster01:~# k3s kubectl get node
+NAME          STATUS   ROLES                  AGE     VERSION
+k3sworker01   Ready    <none>                 3m51s   v1.24.4+k3s1
+k3smaster01   Ready    control-plane,master   30m     v1.24.4+k3s1
+k3sworker02   Ready    <none>                 11s     v1.24.4+k3s1
+
+
+#########
+#Make it easy on CLI
+#########
+Instead of typing always the full command use Bash alias and autocompletion
+https://kubernetes.io/docs/tasks/tools/included/optional-kubectl-configs-bash-linux/
+
+
+
+
+
+
+
+
+
+
+
